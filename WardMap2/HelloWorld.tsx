@@ -1,3 +1,5 @@
+import styles from './HelloWorld.module.css';
+
 import * as React from 'react';
 import {Label} from '@fluentui/react-components';
 
@@ -5,12 +7,10 @@ export interface IHelloWorldProps {
     name?: string;
 }
 
-export class HelloWorld extends React.Component<IHelloWorldProps> {
-    public render(): React.ReactNode {
-        return (
-            <Label>
-                Hello {this.props.name}!
-            </Label>
-        )
-    }
+export function HelloWorld(props: IHelloWorldProps): React.JSX.Element {
+    return (
+        <Label className={styles.myLabel}>
+            Hello {props.name}
+        </Label>
+    )
 }
