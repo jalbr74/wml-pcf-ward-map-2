@@ -10,7 +10,8 @@
         "rebuild": "pcf-scripts rebuild",
         "start": "pcf-scripts start",
         "start:watch": "set USE_DEV_CSS_CLASSNAMES=true && pcf-scripts start watch",
-        "refreshTypes": "pcf-scripts refreshTypes"
+        "refreshTypes": "pcf-scripts refreshTypes",
+        "deploy": "node deploy.js"
     },
     "dependencies": {
         "@fluentui/react-components": "9.46.2",
