@@ -1,5 +1,5 @@
 import {IInputs, IOutputs} from "./generated/ManifestTypes";
-import {HelloWorld, IHelloWorldProps} from "./HelloWorld";
+import {App} from "./app/App";
 import * as React from "react";
 
 export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
@@ -33,10 +33,7 @@ export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutpu
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const props: IHelloWorldProps = {name: 'Power Apps'};
-        return React.createElement(
-            HelloWorld, props
-        );
+        return React.createElement(App);
     }
 
     /**
