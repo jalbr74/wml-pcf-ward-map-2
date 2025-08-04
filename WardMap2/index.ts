@@ -1,5 +1,5 @@
-import { IInputs, IOutputs } from "./generated/ManifestTypes";
-import { HelloWorld, IHelloWorldProps } from "./HelloWorld";
+import {IInputs, IOutputs} from "./generated/ManifestTypes";
+import {HelloWorld, IHelloWorldProps} from "./HelloWorld";
 import * as React from "react";
 
 export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
@@ -33,7 +33,7 @@ export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutpu
      * @returns ReactElement root react element for the control
      */
     public updateView(context: ComponentFramework.Context<IInputs>): React.ReactElement {
-        const props: IHelloWorldProps = { name: 'Power Apps' };
+        const props: IHelloWorldProps = {name: 'Power Apps'};
         return React.createElement(
             HelloWorld, props
         );
@@ -44,7 +44,7 @@ export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutpu
      * @returns an object based on nomenclature defined in manifest, expecting object[s] for property marked as "bound" or "output"
      */
     public getOutputs(): IOutputs {
-        return { };
+        return {};
     }
 
     /**
