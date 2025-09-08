@@ -7,6 +7,7 @@
         "clean": "pcf-scripts clean",
         "lint": "pcf-scripts lint",
         "lint:fix": "pcf-scripts lint fix",
+        "copy-and-fixup-svg": "node scripts/copy-and-fixup-svg.js",
         "rebuild": "pcf-scripts rebuild",
         "start": "pcf-scripts start",
         "start:watch": "set USE_DEV_CSS_CLASSNAMES=true && pcf-scripts start watch",

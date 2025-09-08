@@ -1,3 +1,3 @@
-.myLabel {
-    background-color: red;
+.wrap :global(.is-selected) {
+    fill: red !important;
 }
