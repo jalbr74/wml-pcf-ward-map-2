@@ -9,17 +9,19 @@ import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
 
 export function App(): React.JSX.Element {
     const [state, store] = useComponentStore<AppState, AppStore>(AppStore);
-    const wrapperRef = useRef<HTMLDivElement>(null);
+    const mapContentRef = useRef<HTMLDivElement>(null);
 
-    useEffect(highlightSelectedAddresses(wrapperRef, state), [state.addresses]);
+    useEffect(highlightSelectedAddresses(mapContentRef, state), [state.addresses]);
 
     return (
-        <>
-            <button onClick={() => store.changeSelection()}>Change Selection</button>
-            <div ref={wrapperRef} className={styles.wrap}>
+        <div className={styles.appContainer}>
+            <div className={styles.mapHeader}>
+                <button onClick={() => store.changeSelection()}>Change Selection</button>
+            </div>
+            <div ref={mapContentRef} className={styles.mapContent}>
                 <WardMap />
             </div>
-        </>
+        </div>
     )
 }
 

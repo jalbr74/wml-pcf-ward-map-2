@@ -1,3 +1,24 @@
-.wrap :global(.is-selected) {
-    fill: red !important;
+.appContainer {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    .mapHeader {
+        background-color: lightblue;
+    }
+
+    .mapContent {
+        background-color: white;
+        flex-grow: 1;
+        position: relative;
+        overflow: auto;
+
+        svg {
+            position: absolute;
+
+            :global(.is-selected) {
+                fill: red !important;
+            }
+        }
+    }
 }
