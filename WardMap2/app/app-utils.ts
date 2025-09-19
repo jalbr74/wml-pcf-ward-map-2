@@ -13,3 +13,20 @@ export function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HT
         root.querySelectorAll(sel).forEach(el => el.classList.add("is-selected"));
     });
 }
+
+export function fetchXmlForAllHousesMatchingCategory(categoryId: string): string {
+    return `
+    <fetch>
+      <entity name='jda_home_jda_category'>
+        <attribute name='jda_categoryid' />
+        <attribute name='jda_homeid' />
+        <filter>
+          <condition attribute='jda_categoryid' operator='eq' value='${categoryId}' />
+        </filter>
+        <link-entity name='jda_home' from='jda_homeid' to='jda_homeid' link-type='inner' alias='home'>
+          <attribute name='jda_name' />
+        </link-entity>
+      </entity>
+    </fetch>
+    `;
+}

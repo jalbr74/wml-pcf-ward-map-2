@@ -22,7 +22,7 @@ export function App(): React.JSX.Element {
             <div className={styles.mapHeader}>
                 <Label>Category of Focus:</Label>
                 <Dropdown value={state.selectedCategory?.name ?? "Select one..."}
-                    onOptionSelect={(event, data) => store.changeSelection(event, data)}>
+                    onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
                     {state.availableCategories.map(category =>
                         <Option key={category.id} value={category.id}>{category.name}</Option>
                     )}
