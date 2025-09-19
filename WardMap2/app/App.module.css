@@ -10,6 +10,9 @@
         justify-content: center;
         align-items: center;
         gap: 20px;
+        background-color: rgb(240, 240, 240);
+        border: 1px solid lightgray;
+        padding: 4px 0;
     }
 
     .mapContent {
@@ -23,6 +26,24 @@
             :global(.is-selected) {
                 fill: red !important;
             }
+        }
+    }
+
+    g[data-name*="0"],
+    g[data-name*="1"],
+    g[data-name*="2"],
+    g[data-name*="3"],
+    g[data-name*="4"],
+    g[data-name*="5"],
+    g[data-name*="6"],
+    g[data-name*="7"],
+    g[data-name*="8"],
+    g[data-name*="9"]
+    {
+        cursor: pointer;
+
+        & path {
+            fill: lightyellow !important;
         }
     }
 }

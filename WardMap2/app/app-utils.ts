@@ -1,6 +1,6 @@
 import {AppState} from "./App.store";
 
-export function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HTMLDivElement | null>, state: AppState) {
+export function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HTMLDivElement | null>, selectedAddresses: string[]) {
     const root = wrapperRef.current;
     if (!root) return;
 
@@ -8,8 +8,8 @@ export function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HT
     root.querySelectorAll(".is-selected").forEach(el => el.classList.remove("is-selected"));
 
     // Add selection
-    state.selectedAddresses.forEach(name => {
-        const sel = `path[data-name="${name}"]`;
+    selectedAddresses.forEach(name => {
+        const sel = `g[data-name="${name}"] path`;
         root.querySelectorAll(sel).forEach(el => el.classList.add("is-selected"));
     });
 }

@@ -6,6 +6,8 @@ export interface AppState {
     selectedAddresses: string[];
     availableCategories: CategoryDto[];
     selectedCategory?: CategoryDto;
+    isLoadingCategories?: boolean;
+    isLoadingSelectedHouses?: boolean;
 }
 
 export class AppStore extends ComponentStore<AppState> {
@@ -25,6 +27,10 @@ export class AppStore extends ComponentStore<AppState> {
         });
     }
 
+    init(): void {
+
+    }
+
     changeSelection(event: SelectionEvents, data: OptionOnSelectData) {
         console.log('event: %O', event);
         console.log('data: %O', data);
@@ -35,6 +41,12 @@ export class AppStore extends ComponentStore<AppState> {
                 id: data.optionValue ?? '',
                 name: data.optionText ?? ''
             }
+        });
+    }
+
+    selectHouse(address: string) {
+        this.patchState({
+            selectedAddresses: [address]
         });
     }
 }
