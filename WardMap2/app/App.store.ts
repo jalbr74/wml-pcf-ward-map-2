@@ -44,7 +44,16 @@ export class AppStore extends ComponentStore<AppState> {
         });
     }
 
-    selectHouse(address: string) {
+    handleHouseClicked(e: React.MouseEvent) {
+        const target = e.target as Element;
+        if (!target) return;
+
+        const house = target.closest<SVGGElement>("g[data-name]");
+        if (!house) return;
+
+        const address = house.getAttribute("data-name") ?? "";
+        if (!/\d/.test(address)) return; // The address must contain at least one digit
+
         this.patchState({
             selectedAddresses: [address]
         });

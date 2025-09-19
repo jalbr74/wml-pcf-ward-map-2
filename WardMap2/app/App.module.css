@@ -42,8 +42,8 @@
     {
         cursor: pointer;
 
-        & path {
-            fill: lightyellow !important;
-        }
+        /*& path {*/
+        /*    fill: lightyellow !important;*/
+        /*}*/
     }
 }

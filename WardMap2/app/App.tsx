@@ -1,13 +1,13 @@
 import styles from './App.module.css';
 
 import * as React from 'react';
-import {useCallback, useEffect, useRef} from "react";
+import {useEffect, useRef} from "react";
 import {useComponentStore} from "use-component-store";
 import {AppState, AppStore} from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
-import {highlightSelectedAddresses} from "./app-utils";
-import {Combobox, Dropdown, Label, Option} from "@fluentui/react-components";
+import { highlightSelectedAddresses} from "./app-utils";
+import { Dropdown, Label, Option} from "@fluentui/react-components";
 
 export function App(): React.JSX.Element {
     const mapContentRef = useRef<HTMLDivElement>(null);
@@ -16,20 +16,6 @@ export function App(): React.JSX.Element {
     });
 
     useEffect(() => highlightSelectedAddresses(mapContentRef, state.selectedAddresses), [state.selectedAddresses]);
-
-    // One stable handler; we’ll attach it once.
-    const onSvgClick = useCallback((e: React.MouseEvent) => {
-        const target = e.target as Element | null;
-        if (!target) return;
-
-        const house = target.closest<SVGGElement>("g[data-name]");
-        if (!house) return;
-
-        const address = house.getAttribute("data-name") ?? "";
-        if (!/\d/.test(address)) return; // The address must contain at least one digit
-
-        store.selectHouse(address);
-    }, []);
 
     return (
         <div className={styles.appContainer}>
@@ -43,7 +29,7 @@ export function App(): React.JSX.Element {
                 </Dropdown>
             </div>
             <div ref={mapContentRef} className={styles.mapContent}>
-                <WardMap onClick={onSvgClick} />
+                <WardMap onClick={(e: React.MouseEvent) => store.handleHouseClicked(e)} />
             </div>
         </div>
     )
