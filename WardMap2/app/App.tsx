@@ -6,7 +6,6 @@ import {useComponentStore} from "use-component-store";
 import {AppState, AppStore} from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
-import { highlightSelectedAddresses} from "./app-utils";
 import { Dropdown, Label, Option} from "@fluentui/react-components";
 
 export function App(): React.JSX.Element {
@@ -29,8 +28,38 @@ export function App(): React.JSX.Element {
                 </Dropdown>
             </div>
             <div ref={mapContentRef} className={styles.mapContent}>
-                <WardMap onClick={(e: React.MouseEvent) => store.handleHouseClicked(e)} />
+                <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)} />
             </div>
         </div>
     )
+}
+
+//
+// Pure functions to support the component logic
+//
+
+function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HTMLDivElement | null>, selectedAddresses: string[]) {
+    const root = wrapperRef.current;
+    if (!root) return;
+
+    // Clear previous selection
+    root.querySelectorAll(".is-selected").forEach(el => el.classList.remove("is-selected"));
+
+    // Add selection
+    selectedAddresses.forEach(name => {
+        const sel = `g[data-name="${name}"] path`;
+        root.querySelectorAll(sel).forEach(el => el.classList.add("is-selected"));
+    });
+}
+
+function handleHouseClicked(target: Element, store: AppStore) {
+    if (!target) return;
+
+    const house = target.closest<SVGGElement>("g[data-name]");
+    if (!house) return;
+
+    const address = house.getAttribute("data-name") ?? "";
+    if (!/\d/.test(address)) return; // The address must contain at least one digit
+
+    store.selectHouse(address);
 }

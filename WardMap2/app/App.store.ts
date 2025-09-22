@@ -2,7 +2,6 @@ import {ComponentStore} from "use-component-store";
 import {OptionOnSelectData, SelectionEvents} from "@fluentui/react-combobox";
 import {CategoryDto} from "../models/category";
 import {map, switchMap, tap} from "rxjs";
-import {fetchXmlForAllHousesMatchingCategory} from "./app-utils";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 
 export interface AppState {
@@ -65,21 +64,6 @@ export class AppStore extends ComponentStore<AppState> {
             )
     );
 
-    handleHouseClicked(e: React.MouseEvent) {
-        const target = e.target as Element;
-        if (!target) return;
-
-        const house = target.closest<SVGGElement>("g[data-name]");
-        if (!house) return;
-
-        const address = house.getAttribute("data-name") ?? "";
-        if (!/\d/.test(address)) return; // The address must contain at least one digit
-
-        this.patchState({
-            selectedAddresses: [address]
-        });
-    }
-
     fetchCategories = this.effect<void>(
         origin$ => origin$.pipe(
             tap(() => this.patchState({ isLoadingCategories: true })),
@@ -101,4 +85,31 @@ export class AppStore extends ComponentStore<AppState> {
             })
         )
     );
+
+    selectHouse(address: string) {
+        this.patchState({
+            selectedAddresses: [address]
+        });
+    }
+}
+
+//
+// Pure functions to support the store logic
+//
+
+export function fetchXmlForAllHousesMatchingCategory(categoryId: string): string {
+    return `
+    <fetch>
+      <entity name='jda_home_jda_category'>
+        <attribute name='jda_categoryid' />
+        <attribute name='jda_homeid' />
+        <filter>
+          <condition attribute='jda_categoryid' operator='eq' value='${categoryId}' />
+        </filter>
+        <link-entity name='jda_home' from='jda_homeid' to='jda_homeid' link-type='inner' alias='home'>
+          <attribute name='jda_name' />
+        </link-entity>
+      </entity>
+    </fetch>
+    `;
 }
