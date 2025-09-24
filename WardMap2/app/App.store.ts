@@ -5,7 +5,8 @@ import {map, switchMap, tap} from "rxjs";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 
 export interface AppState {
-    selectedAddresses: string[];
+    highlightedAddresses: string[];
+    openedAddress?: string;
     availableCategories: CategoryDto[];
     selectedCategory?: CategoryDto;
     isLoadingCategories?: boolean;
@@ -15,7 +16,7 @@ export interface AppState {
 export class AppStore extends ComponentStore<AppState> {
     constructor() {
         super({
-            selectedAddresses: [],
+            highlightedAddresses: [],
             availableCategories: [],
         });
     }
@@ -36,7 +37,7 @@ export class AppStore extends ComponentStore<AppState> {
             .pipe(
                 tap((category: CategoryDto) => {
                     this.patchState({
-                        selectedAddresses: [],
+                        highlightedAddresses: [],
                         selectedCategory: category,
                         isLoadingSelectedHouses: true
                     });
@@ -55,7 +56,7 @@ export class AppStore extends ComponentStore<AppState> {
                             const addresses = Array.from(uniqueAddresses);
 
                             this.patchState({
-                                selectedAddresses: addresses,
+                                highlightedAddresses: addresses,
                                 isLoadingSelectedHouses: false
                             });
                         })
@@ -86,9 +87,15 @@ export class AppStore extends ComponentStore<AppState> {
         )
     );
 
-    selectHouse(address: string) {
+    showHouseInfo(address: string) {
         this.patchState({
-            selectedAddresses: [address]
+            openedAddress: address
+        });
+    }
+
+    hideHouseInfo() {
+        this.patchState({
+            openedAddress: undefined
         });
     }
 }

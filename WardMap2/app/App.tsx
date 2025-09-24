@@ -7,30 +7,35 @@ import {AppState, AppStore} from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
 import { Dropdown, Label, Option} from "@fluentui/react-components";
+import {HomeInfoDialog} from "./home-info/HomeInfoDialog";
 
 export function App(): React.JSX.Element {
     const mapContentRef = useRef<HTMLDivElement>(null);
-    const [state, store] = useComponentStore<AppState, AppStore>(AppStore, () => {
-        store.init();
-    });
+    const [state, store] = useComponentStore(AppStore);
 
-    useEffect(() => highlightSelectedAddresses(mapContentRef, state.selectedAddresses), [state.selectedAddresses]);
+    useEffect(() => highlightSelectedAddresses(mapContentRef, state.highlightedAddresses), [state.highlightedAddresses]);
 
     return (
-        <div className={styles.appContainer}>
-            <div className={styles.mapHeader}>
-                <Label>Category of Focus:</Label>
-                <Dropdown value={state.selectedCategory?.name ?? "Select one..."}
-                    onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
-                    {state.availableCategories.map(category =>
-                        <Option key={category.id} value={category.id}>{category.name}</Option>
-                    )}
-                </Dropdown>
+        <>
+            <div className={styles.appContainer}>
+                <div className={styles.mapHeader}>
+                    <Label>Category of Focus:</Label>
+                    <Dropdown value={state.selectedCategory?.name ?? "Select one..."}
+                        onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
+                        {state.availableCategories.map(category =>
+                            <Option key={category.id} value={category.id}>{category.name}</Option>
+                        )}
+                    </Dropdown>
+                </div>
+                <div ref={mapContentRef} className={styles.mapContent}>
+                    <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)} />
+                </div>
             </div>
-            <div ref={mapContentRef} className={styles.mapContent}>
-                <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)} />
-            </div>
-        </div>
+
+            {state.openedAddress && (
+                <HomeInfoDialog address={state.openedAddress} onDialogDismissed={() => store.hideHouseInfo()} />
+            )}
+        </>
     )
 }
 
@@ -61,5 +66,5 @@ function handleHouseClicked(target: Element, store: AppStore) {
     const address = house.getAttribute("data-name") ?? "";
     if (!/\d/.test(address)) return; // The address must contain at least one digit
 
-    store.selectHouse(address);
+    store.showHouseInfo(address);
 }
