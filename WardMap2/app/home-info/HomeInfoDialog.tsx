@@ -9,6 +9,7 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@fluentui/react-components";
+import { Dismiss24Regular } from "@fluentui/react-icons";
 import {useComponentStore} from "use-component-store";
 import {HomeInfoDialogState, HomeInfoDialogStore} from "./HomeInfoDialog.store";
 
@@ -18,22 +19,23 @@ interface HomeInfoProps {
 }
 
 export function HomeInfoDialog({address, onDialogDismissed}: HomeInfoProps) {
-    const [state, store] = useComponentStore(HomeInfoDialogStore);
+    const [state, store] = useComponentStore(HomeInfoDialogStore, [address]);
 
     return (
         <Dialog open={true}>
             <DialogSurface className={styles.fullWidthSurface}>
                 <DialogBody>
-                    <DialogTitle>Dialog title</DialogTitle>
-                    <DialogContent>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-                        exercitationem cumque repellendus eaque est dolor eius expedita
-                        nulla ullam? Tenetur reprehenderit aut voluptatum impedit voluptates
-                        in natus iure cumque eaque?
+                    <DialogTitle action={
+                        <Button appearance="subtle" aria-label="close" icon={<Dismiss24Regular />}
+                            onClick={() => onDialogDismissed?.()}
+                        />
+                    }>{state.address}</DialogTitle>
+                    <DialogContent className={styles.dialogContent}>
+                        <h3>Notes</h3>
+                        <div>{state.notes}</div>
+                        <h3>Contacts</h3>
+                        <div>John Doe - Nice person, asked the missionaries to come back the next week.</div>
                     </DialogContent>
-                    <DialogActions>
-                        <Button appearance="secondary" onClick={() => onDialogDismissed?.()}>Close</Button>
-                    </DialogActions>
                 </DialogBody>
             </DialogSurface>
         </Dialog>

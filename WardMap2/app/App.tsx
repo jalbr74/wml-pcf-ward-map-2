@@ -3,15 +3,15 @@ import styles from './App.module.css';
 import * as React from 'react';
 import {useEffect, useRef} from "react";
 import {useComponentStore} from "use-component-store";
-import {AppState, AppStore} from "./App.store";
+import {AppStore} from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
 import { Dropdown, Label, Option} from "@fluentui/react-components";
 import {HomeInfoDialog} from "./home-info/HomeInfoDialog";
 
 export function App(): React.JSX.Element {
-    const mapContentRef = useRef<HTMLDivElement>(null);
     const [state, store] = useComponentStore(AppStore);
+    const mapContentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => highlightSelectedAddresses(mapContentRef, state.highlightedAddresses), [state.highlightedAddresses]);
 

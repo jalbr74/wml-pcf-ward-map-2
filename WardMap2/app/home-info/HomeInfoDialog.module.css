@@ -6,3 +6,9 @@
     margin: 0;
     border-radius: 0;
 }
+
+.dialogContent {
+    & h3 {
+        margin: 20px 0;
+    }
+}
