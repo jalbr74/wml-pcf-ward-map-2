@@ -1,33 +1,39 @@
 import {ComponentStore} from "use-component-store";
-import { retrieveHomeInfo } from "../../utils/xrm-utils";
-import { catchError, combineLatest, EMPTY, switchMap, tap } from "rxjs";
-
+import { retrieveContactsForHome, retrieveHomeInfo } from "../../utils/xrm-utils";
+import { catchError, combineLatest, EMPTY, of, switchMap, tap } from "rxjs";
+import { ContactDto } from "../../models/contact";
 
 export interface HomeInfoDialogState {
     address?: string;
     notes?: string;
+    contacts: ContactDto[]
 }
 
 export class HomeInfoDialogStore extends ComponentStore<HomeInfoDialogState> {
-    constructor(private address: string | undefined) {
+    constructor(private address: string) {
         super({
+            contacts: [],
             address
         });
     }
 
     init() {
+        console.log(`Initializing HomeInfoDialogStore for address: ${this.address}`);
+
         this.fetchHomeInfo();
     }
 
-    fetchHomeInfo = this.effect($origin => $origin
+    fetchHomeInfo = this.effect<void>($origin => $origin
         .pipe(
             switchMap(() => combineLatest([
-                retrieveHomeInfo(this.address)
+                retrieveHomeInfo(this.address),
+                retrieveContactsForHome(this.address)
             ]).pipe(
                 tap({
-                    next: ([home]) => {
+                    next: ([home, contacts]) => {
                         this.patchState({
-                            notes: home?.notes
+                            notes: home?.notes,
+                            contacts
                         });
                     },
                     error: (e) => console.error(e),

@@ -2,6 +2,7 @@ import { map, Observable, of } from "rxjs";
 import {CategoryDto} from "../models/category";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
 import { HomeDto } from "../models/home";
+import { ContactDto } from "../models/contact";
 
 export function retrieveAllCategories(): Observable<CategoryDto[]> {
     return fromPromise(
@@ -44,11 +45,11 @@ export function retrieveAddressesMatchingCategory(categoryId: string): Observabl
     );
 }
 
-export function retrieveHomeInfo(name: string | undefined): Observable<HomeDto | undefined> {
-    if (!name) return of(undefined);
+export function retrieveHomeInfo(address: string | undefined): Observable<HomeDto | undefined> {
+    if (!address) return of(undefined);
 
     return fromPromise(
-        Xrm.WebApi.retrieveMultipleRecords('jda_home', `?$select=jda_name,jda_notes&$filter=jda_name eq '${name}'`)
+        Xrm.WebApi.retrieveMultipleRecords('jda_home', `?$select=jda_name,jda_notes&$filter=jda_name eq '${address}'`)
     ).pipe(
         map(response => {
             if (response.entities.length < 1) return;
@@ -60,6 +61,44 @@ export function retrieveHomeInfo(name: string | undefined): Observable<HomeDto |
                 name: homeEntity['jda_name'],
                 notes: homeEntity['jda_notes'] ?? ''
             };
+        })
+    );
+}
+
+export function retrieveContactsForHome(address: string | undefined): Observable<ContactDto[]> {
+    console.log(`Retrieving contacts for home at address: ${address}`);
+
+    if (!address) return of([]);
+
+    const fetchXml = `
+      <fetch>
+        <entity name="contact">
+          <attribute name="fullname" />
+          <attribute name="jda_notes" />
+          <link-entity name="jda_home" from="jda_homeid" to="jda_home" link-type="inner" alias="home">
+            <filter>
+              <condition attribute="jda_name" operator="eq" value="${address}" />
+            </filter>
+          </link-entity>
+        </entity>
+      </fetch>
+    `;
+
+    return fromPromise(
+        Xrm.WebApi.retrieveMultipleRecords('contact', `?fetchXml=${fetchXml}`)
+    ).pipe(
+        map(response => {
+            const contacts: ContactDto[] = [];
+
+            response.entities.forEach(entity => {
+                contacts.push({
+                    id: entity['contactid'],
+                    name: entity['fullname'],
+                    notes: entity['jda_notes'] ?? ''
+                });
+            });
+
+            return contacts;
         })
     );
 }
