@@ -1,17 +1,17 @@
 import { map, Observable, of } from "rxjs";
-import {CategoryDto} from "../models/category";
+import { Category, CategoryDto, HomeCategoryDto } from "../models/category";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
-import { HomeDto } from "../models/home";
-import { ContactDto } from "../models/contact";
+import { Home, HomeDto } from "../models/home";
+import { Contact, ContactDto } from "../models/contact";
 
-export function retrieveAllCategories(): Observable<CategoryDto[]> {
+export function retrieveAllCategories(): Observable<Category[]> {
     return fromPromise(
         Xrm.WebApi.retrieveMultipleRecords('jda_category', '?$select=jda_name,jda_categoryid&$orderby=jda_name asc')
     ).pipe(
         map(response => response.entities.map(
-            entity => ({
-                id: entity['jda_categoryid'],
-                name: entity['jda_name']
+            (categoryDto: CategoryDto) => ({
+                id: categoryDto.jda_categoryid,
+                name: categoryDto.jda_name
             })
         ))
     );
@@ -38,14 +38,14 @@ export function retrieveAddressesMatchingCategory(categoryId: string): Observabl
     ).pipe(
         map(response => {
             const uniqueAddresses = new Set<string>();
-            response.entities.forEach(entity => uniqueAddresses.add(entity['home.jda_name']));
+            response.entities.forEach((entity: HomeCategoryDto) => uniqueAddresses.add(entity['home.jda_name']));
 
             return Array.from(uniqueAddresses);
         })
     );
 }
 
-export function retrieveHomeInfo(address: string | undefined): Observable<HomeDto | undefined> {
+export function retrieveHomeInfo(address: string | undefined): Observable<Home | undefined> {
     if (!address) return of(undefined);
 
     return fromPromise(
@@ -54,18 +54,18 @@ export function retrieveHomeInfo(address: string | undefined): Observable<HomeDt
         map(response => {
             if (response.entities.length < 1) return;
 
-            const homeEntity = response.entities[0];
+            const homeEntity = response.entities[0] as HomeDto;
 
             return {
-                id: homeEntity['jda_homeid'],
-                name: homeEntity['jda_name'],
-                notes: homeEntity['jda_notes'] ?? ''
+                id: homeEntity.jda_homeid,
+                name: homeEntity.jda_name,
+                notes: homeEntity.jda_notes ?? ''
             };
         })
     );
 }
 
-export function retrieveContactsForHome(address: string | undefined): Observable<ContactDto[]> {
+export function retrieveContactsForHome(address: string | undefined): Observable<Contact[]> {
     console.log(`Retrieving contacts for home at address: ${address}`);
 
     if (!address) return of([]);
@@ -88,13 +88,13 @@ export function retrieveContactsForHome(address: string | undefined): Observable
         Xrm.WebApi.retrieveMultipleRecords('contact', `?fetchXml=${fetchXml}`)
     ).pipe(
         map(response => {
-            const contacts: ContactDto[] = [];
+            const contacts: Contact[] = [];
 
-            response.entities.forEach(entity => {
+            response.entities.forEach((entity: ContactDto) => {
                 contacts.push({
-                    id: entity['contactid'],
-                    name: entity['fullname'],
-                    notes: entity['jda_notes'] ?? ''
+                    id: entity.contactid,
+                    name: entity.fullname,
+                    notes: entity.jda_notes ?? ''
                 });
             });
 

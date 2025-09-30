@@ -1,12 +1,12 @@
 import {ComponentStore} from "use-component-store";
 import { retrieveContactsForHome, retrieveHomeInfo } from "../../utils/xrm-utils";
 import { catchError, combineLatest, EMPTY, of, switchMap, tap } from "rxjs";
-import { ContactDto } from "../../models/contact";
+import { Contact } from "../../models/contact";
 
 export interface HomeInfoDialogState {
     address?: string;
     notes?: string;
-    contacts: ContactDto[]
+    contacts: Contact[]
 }
 
 export class HomeInfoDialogStore extends ComponentStore<HomeInfoDialogState> {

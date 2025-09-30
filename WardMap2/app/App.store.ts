@@ -1,14 +1,14 @@
 import { ComponentStore } from "use-component-store";
 import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
-import { CategoryDto } from "../models/category";
+import { Category } from "../models/category";
 import { catchError, EMPTY, switchMap, tap } from "rxjs";
 import { retrieveAddressesMatchingCategory, retrieveAllCategories } from "../utils/xrm-utils";
 
 export interface AppState {
     highlightedAddresses: string[];
     openedAddress?: string;
-    availableCategories: CategoryDto[];
-    selectedCategory?: CategoryDto;
+    availableCategories: Category[];
+    selectedCategory?: Category;
     isLoadingCategories?: boolean;
     isLoadingSelectedHouses?: boolean;
 }
@@ -32,16 +32,16 @@ export class AppStore extends ComponentStore<AppState> {
         });
     }
 
-    fetchHousesForCategory = this.effect<CategoryDto>(origin$ => origin$
+    fetchHousesForCategory = this.effect<Category>(origin$ => origin$
         .pipe(
-            tap((category: CategoryDto) => {
+            tap((category: Category) => {
                 this.patchState({
                     highlightedAddresses: [],
                     selectedCategory: category,
                     isLoadingSelectedHouses: true
                 });
             }),
-            switchMap((category: CategoryDto) => retrieveAddressesMatchingCategory(category.id)
+            switchMap((category: Category) => retrieveAddressesMatchingCategory(category.id)
                 .pipe(
                     tap({
                         next: (addresses) => {
