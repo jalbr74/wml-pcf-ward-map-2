@@ -1,13 +1,13 @@
 import styles from './App.module.css';
 
 import * as React from 'react';
-import {useEffect, useRef} from "react";
-import {useComponentStore} from "use-component-store";
-import {AppStore} from "./App.store";
+import { useEffect, useRef } from "react";
+import { useComponentStore } from "use-component-store";
+import { AppStore } from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
-import { Dropdown, Label, Option} from "@fluentui/react-components";
-import {HomeInfoDialog} from "./home-info/HomeInfoDialog";
+import { Dropdown, Label, Option } from "@fluentui/react-components";
+import { HomeInfoDialog } from "./home-info/HomeInfoDialog";
 
 export function App(): React.JSX.Element {
     const [state, store] = useComponentStore(AppStore);
@@ -21,19 +21,19 @@ export function App(): React.JSX.Element {
                 <div className={styles.mapHeader}>
                     <Label>Category of Focus:</Label>
                     <Dropdown value={state.selectedCategory?.name ?? "Select one..."}
-                        onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
+                              onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
                         {state.availableCategories.map(category =>
                             <Option key={category.id} value={category.id}>{category.name}</Option>
                         )}
                     </Dropdown>
                 </div>
                 <div ref={mapContentRef} className={styles.mapContent}>
-                    <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)} />
+                    <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)}/>
                 </div>
             </div>
 
             {state.openedAddress && (
-                <HomeInfoDialog address={state.openedAddress} onDialogDismissed={() => store.hideHouseInfo()} />
+                <HomeInfoDialog address={state.openedAddress} onDialogDismissed={() => store.hideHouseInfo()}/>
             )}
         </>
     )

@@ -1,17 +1,8 @@
 import styles from './HomeInfoDialog.module.css';
 import * as React from "react";
-import {
-    Button,
-    Dialog, DialogActions,
-    DialogBody,
-    DialogContent,
-    DialogSurface,
-    DialogTitle,
-    DialogTrigger
-} from "@fluentui/react-components";
+import { Button, Dialog, DialogBody, DialogContent, DialogSurface, DialogTitle } from "@fluentui/react-components";
 import { Dismiss24Regular } from "@fluentui/react-icons";
-// import {useComponentStore} from "use-component-store";
-import {HomeInfoDialogState, HomeInfoDialogStore} from "./HomeInfoDialog.store";
+import { HomeInfoDialogStore } from "./HomeInfoDialog.store";
 import { useComponentStore } from "use-component-store";
 
 interface HomeInfoProps {
