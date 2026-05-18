@@ -10,8 +10,7 @@
         "prepare-svg": "node scripts/prepare-svg.js",
         "rebuild": "pcf-scripts rebuild",
         "start": "pcf-scripts start",
-        "start:watch": "set USE_DEV_CSS_CLASSNAMES=true && pcf-scripts start watch",
-        "start:auto-copy": "node scripts/watch-copy.js",
+        "start:watch": "pcf-scripts start watch",
         "refreshTypes": "pcf-scripts refreshTypes",
         "deploy": "node scripts/deploy.js"
     },
@@ -30,8 +29,6 @@
         "@types/react": "^16.14.60",
         "@types/react-dom": "^16.9.24",
         "@types/xrm": "^9.0.87",
-        "chokidar": "^5.0.0",
-        "dotenv": "^17.2.3",
         "eslint-plugin-promise": "^7.1.0",
         "eslint-plugin-react": "^7.37.2",
         "globals": "^15.15.0",
