@@ -1,7 +1,6 @@
-import styles from './HomeInfoDialog.module.css';
+import * as styles from './HomeInfoDialog.module.css';
 import * as React from "react";
 import { Button, Dialog, DialogBody, DialogContent, DialogSurface, DialogTitle } from "@fluentui/react-components";
-import { Dismiss24Regular } from "@fluentui/react-icons";
 import { HomeInfoDialogStore } from "./HomeInfoDialog.store";
 import { useComponentStore } from "use-component-store";
 
@@ -18,9 +17,7 @@ export function HomeInfoDialog({address, onDialogDismissed}: HomeInfoProps) {
             <DialogSurface className={styles.fullWidthSurface}>
                 <DialogBody>
                     <DialogTitle action={
-                        <Button appearance="subtle" aria-label="close" icon={<Dismiss24Regular />}
-                            onClick={() => onDialogDismissed?.()}
-                        />
+                        <Button appearance="subtle" aria-label="close" onClick={() => onDialogDismissed?.()}>X</Button>
                     }>{state.address}</DialogTitle>
                     <DialogContent className={styles.dialogContent}>
                         <h3>Notes</h3>

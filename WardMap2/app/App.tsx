@@ -1,4 +1,4 @@
-import styles from './App.module.css';
+import * as styles from './App.module.css';
 
 import * as React from 'react';
 import { useEffect, useRef } from "react";

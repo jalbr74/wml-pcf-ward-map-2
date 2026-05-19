@@ -2,7 +2,7 @@ import {IInputs, IOutputs} from "./generated/ManifestTypes";
 import {App} from "./app/App";
 import * as React from "react";
 
-console.log('WardMap2 version: 1.2.4');
+console.log('WardMap2 version: 1.3.5');
 
 export class WardMap2 implements ComponentFramework.ReactControl<IInputs, IOutputs> {
     private notifyOutputChanged: () => void;
