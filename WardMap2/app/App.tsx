@@ -15,6 +15,11 @@ export function App(): React.JSX.Element {
 
     useEffect(() => highlightSelectedAddresses(mapContentRef, state.highlightedAddresses), [state.highlightedAddresses]);
 
+    function onAddressSelectionChanged(e: React.ChangeEvent<HTMLSelectElement>) {
+        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+        store.highlightSelectedAddresses(selectedOptions);
+    }
+
     return (
         <>
             <div className={styles.appContainer}>
@@ -26,6 +31,10 @@ export function App(): React.JSX.Element {
                             <Option key={category.id} value={category.id}>{category.name}</Option>
                         )}
                     </Dropdown>
+                    {/* This is handy for making sure all the houses have unique addresses */}
+                    <select multiple size={1} onChange={onAddressSelectionChanged}>
+                        {state.availableAddresses.map(address => <option key={address}>{address}</option>)}
+                    </select>
                 </div>
                 <div ref={mapContentRef} className={styles.mapContent}>
                     <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)}/>

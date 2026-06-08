@@ -3,11 +3,13 @@ import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
 import { Category } from "../models/category";
 import { catchError, EMPTY, switchMap, tap } from "rxjs";
 import { retrieveAddressesMatchingCategory, retrieveAllCategories } from "../utils/xrm-utils";
+import { HomeDto } from "../models/home";
 
 export interface AppState {
     highlightedAddresses: string[];
     openedAddress?: string;
     availableCategories: Category[];
+    availableAddresses: string[];
     selectedCategory?: Category;
     isLoadingCategories?: boolean;
     isLoadingSelectedHouses?: boolean;
@@ -18,11 +20,13 @@ export class AppStore extends ComponentStore<AppState> {
         super({
             highlightedAddresses: [],
             availableCategories: [],
+            availableAddresses: []
         });
     }
 
-    init(): void {
+    async init(): Promise<void> {
         this.fetchCategories();
+        await this.fetchAddresses();
     }
 
     handleCategorySelected(event: SelectionEvents, data: OptionOnSelectData) {
@@ -86,6 +90,16 @@ export class AppStore extends ComponentStore<AppState> {
         )
     );
 
+    async fetchAddresses() {
+        const homes = await Xrm.WebApi.retrieveMultipleRecords('jda_home', '?$select=jda_name');
+        const allKnownAddresses = homes.entities.map((homeDto: HomeDto) => homeDto.jda_name);
+        const sortedAddresses = allKnownAddresses.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        this.patchState({
+            availableAddresses: sortedAddresses
+        });
+    }
+
     showHouseInfo(address: string) {
         this.patchState({
             openedAddress: address
@@ -96,5 +110,11 @@ export class AppStore extends ComponentStore<AppState> {
         this.patchState({
             openedAddress: undefined
         });
+    }
+
+    highlightSelectedAddresses(highlightedAddresses: string[]) {
+        this.patchState({
+            highlightedAddresses
+        })
     }
 }
