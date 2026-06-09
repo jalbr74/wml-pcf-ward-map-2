@@ -7,6 +7,7 @@ import { AppStore } from "./App.store";
 
 import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
 import { Dropdown, Label, Option } from "@fluentui/react-components";
+import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
 
 // TODO: Maybe we just open the Home form when a home is clicked, instead of building a custom dialog? It would be less work and would allow users to edit the home record directly.
 
@@ -16,20 +17,27 @@ export function App(): React.JSX.Element {
 
     useEffect(() => highlightSelectedAddresses(mapContentRef, state.highlightedAddresses), [state.highlightedAddresses]);
 
+    function onDropdownClick(e: SelectionEvents, data: OptionOnSelectData) {
+        store.handleCategorySelected(data).catch(console.error);
+    }
+
+    function onMapClick(e: React.MouseEvent) {
+        handleHouseClicked(e.target as Element, store).catch(console.error);
+    }
+
     return (
         <>
             <div className={styles.appContainer}>
                 <div className={styles.mapHeader}>
                     <Label>Category of Focus:</Label>
-                    <Dropdown value={state.selectedCategory?.name ?? "Select one..."}
-                              onOptionSelect={(event, data) => store.handleCategorySelected(event, data)}>
+                    <Dropdown value={state.selectedCategory?.name ?? "Select one..."} onOptionSelect={onDropdownClick}>
                         {state.availableCategories.map(category =>
                             <Option key={category.id} value={category.id}>{category.name}</Option>
                         )}
                     </Dropdown>
                 </div>
                 <div ref={mapContentRef} className={styles.mapContent}>
-                    <WardMap onClick={(e: React.MouseEvent) => handleHouseClicked(e.target as Element, store)}/>
+                    <WardMap onClick={onMapClick}/>
                 </div>
             </div>
         </>
@@ -54,7 +62,7 @@ function highlightSelectedAddresses(wrapperRef: React.MutableRefObject<HTMLDivEl
     });
 }
 
-function handleHouseClicked(target: Element, store: AppStore) {
+async function handleHouseClicked(target: Element, store: AppStore) {
     if (!target) return;
 
     const house = target.closest<SVGGElement>("g[data-name]");
@@ -63,5 +71,5 @@ function handleHouseClicked(target: Element, store: AppStore) {
     const address = house.getAttribute("data-name") ?? "";
     if (!/\d/.test(address)) return; // The address must contain at least one digit
 
-    store.showHouseInfo(address);
+    await store.showHouseInfo(address);
 }

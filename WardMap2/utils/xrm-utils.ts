@@ -1,23 +1,19 @@
-import { map, Observable, of } from "rxjs";
 import { Category, CategoryDto, HomeCategoryDto } from "../models/category";
-import {fromPromise} from "rxjs/internal/observable/innerFrom";
-import { Home, HomeDto } from "../models/home";
-import { Contact, ContactDto } from "../models/contact";
+import { HomeDto } from "../models/home";
 
-export function retrieveAllCategories(): Observable<Category[]> {
-    return fromPromise(
-        Xrm.WebApi.retrieveMultipleRecords('jda_category', '?$select=jda_name,jda_categoryid&$orderby=jda_name asc')
-    ).pipe(
-        map(response => response.entities.map(
-            (categoryDto: CategoryDto) => ({
-                id: categoryDto.jda_categoryid,
-                name: categoryDto.jda_name
-            })
-        ))
+export async function retrieveAllCategories(): Promise<Category[]> {
+    const result = await Xrm.WebApi.retrieveMultipleRecords(
+        'jda_category', '?$select=jda_name,jda_categoryid&$orderby=jda_name asc');
+
+    return result.entities.map(
+        (categoryDto: CategoryDto) => ({
+            id: categoryDto.jda_categoryid,
+            name: categoryDto.jda_name
+        })
     );
 }
 
-export function retrieveAddressesMatchingCategory(categoryId: string): Observable<string[]> {
+export async function retrieveAddressesMatchingCategory(categoryId: string): Promise<string[]> {
     const fetchXml = `
       <fetch>
         <entity name='jda_home_jda_category'>
@@ -33,16 +29,12 @@ export function retrieveAddressesMatchingCategory(categoryId: string): Observabl
       </fetch>
     `;
 
-    return fromPromise(
-        Xrm.WebApi.retrieveMultipleRecords('jda_home_jda_category', `?fetchXml=${fetchXml}`)
-    ).pipe(
-        map(response => {
-            const uniqueAddresses = new Set<string>();
-            response.entities.forEach((entity: HomeCategoryDto) => uniqueAddresses.add(entity['home.jda_name']));
+    const response = await Xrm.WebApi.retrieveMultipleRecords('jda_home_jda_category', `?fetchXml=${fetchXml}`);
 
-            return Array.from(uniqueAddresses);
-        })
-    );
+    const uniqueAddresses = new Set<string>();
+    response.entities.forEach((entity: HomeCategoryDto) => uniqueAddresses.add(entity['home.jda_name']));
+
+    return Array.from(uniqueAddresses);
 }
 
 export async function retrieveHomeId(address: string | undefined): Promise<string | undefined> {

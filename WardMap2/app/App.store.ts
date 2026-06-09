@@ -1,7 +1,6 @@
 import { ComponentStore } from "use-component-store";
 import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
 import { Category } from "../models/category";
-import { catchError, EMPTY, switchMap, tap } from "rxjs";
 import { retrieveAddressesMatchingCategory, retrieveAllCategories, retrieveHomeId } from "../utils/xrm-utils";
 import { HomeDto } from "../models/home";
 
@@ -10,8 +9,6 @@ export interface AppState {
     availableCategories: Category[];
     availableAddresses: string[];
     selectedCategory?: Category;
-    isLoadingCategories?: boolean;
-    isLoadingSelectedHouses?: boolean;
 }
 
 export class AppStore extends ComponentStore<AppState> {
@@ -23,71 +20,41 @@ export class AppStore extends ComponentStore<AppState> {
         });
     }
 
-    async init(): Promise<void> {
-        this.fetchCategories();
-        await this.fetchAddresses();
+    init() {
+        Promise.allSettled([
+            this.fetchCategories(),
+            this.fetchAddresses()
+        ]).catch(error => console.error("Error initializing AppStore:", error));
     }
 
-    handleCategorySelected(event: SelectionEvents, data: OptionOnSelectData) {
-        this.fetchHousesForCategory({
-            id: data.optionValue ?? '',
-            name: data.optionText ?? ''
+    async handleCategorySelected(data: OptionOnSelectData) {
+        const category = this.state.availableCategories.find(c => c.id === data.optionValue);
+        if (!category) return;
+
+        Xrm.Utility.showProgressIndicator("Loading...");
+
+        this.patchState({
+            highlightedAddresses: [],
+            selectedCategory: category
+        });
+
+        try {
+            const addresses = await retrieveAddressesMatchingCategory(category.id);
+            this.patchState({
+                highlightedAddresses: addresses
+            });
+        }
+        finally {
+            Xrm.Utility.closeProgressIndicator();
+        }
+    }
+
+    async fetchCategories() {
+        const categories = await retrieveAllCategories();
+        this.patchState({
+            availableCategories: categories
         });
     }
-
-    fetchHousesForCategory = this.effect<Category>(origin$ => origin$
-        .pipe(
-            tap((category: Category) => {
-                this.patchState({
-                    highlightedAddresses: [],
-                    selectedCategory: category,
-                    isLoadingSelectedHouses: true
-                });
-            }),
-            switchMap((category: Category) => retrieveAddressesMatchingCategory(category.id)
-                .pipe(
-                    tap({
-                        next: (addresses) => {
-                            this.patchState({
-                                highlightedAddresses: addresses,
-                                isLoadingSelectedHouses: false
-                            });
-                        },
-
-                        error: (e) => {
-                            this.patchState({ isLoadingSelectedHouses: false });
-                            console.error(e);
-                        },
-                    }),
-                    catchError((error) => EMPTY)
-                )
-            )
-        )
-    );
-
-    fetchCategories = this.effect<void>(origin$ => origin$
-        .pipe(
-            tap(() => this.patchState({ isLoadingCategories: true })),
-            switchMap(() => retrieveAllCategories()
-                .pipe(
-                    tap({
-                        next: (categories) => {
-                            this.patchState({
-                                availableCategories: categories,
-                                isLoadingCategories: false
-                            });
-                        },
-                        error: (e) => {
-                            this.patchState({ isLoadingCategories: false });
-
-                            console.error(e)
-                        },
-                    }),
-                    catchError((error) => EMPTY)
-                )
-            )
-        )
-    );
 
     async fetchAddresses() {
         const homes = await Xrm.WebApi.retrieveMultipleRecords('jda_home', '?$select=jda_name');
@@ -102,7 +69,7 @@ export class AppStore extends ComponentStore<AppState> {
     async showHouseInfo(address: string) {
         if (!/\d/.test(address)) return; // The address must contain at least one digit
 
-        Xrm.Utility.showProgressIndicator("Loading home information...");
+        Xrm.Utility.showProgressIndicator("Loading...");
 
         const homeId = await retrieveHomeId(address);
         if (!homeId) return;
