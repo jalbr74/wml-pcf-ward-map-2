@@ -45,60 +45,12 @@ export function retrieveAddressesMatchingCategory(categoryId: string): Observabl
     );
 }
 
-export function retrieveHomeInfo(address: string | undefined): Observable<Home | undefined> {
-    if (!address) return of(undefined);
+export async function retrieveHomeId(address: string | undefined): Promise<string | undefined> {
+    if (!address) return Promise.resolve(undefined);
 
-    return fromPromise(
-        Xrm.WebApi.retrieveMultipleRecords('jda_home', `?$select=jda_name,jda_notes&$filter=jda_name eq '${address}'`)
-    ).pipe(
-        map(response => {
-            if (response.entities.length < 1) return;
+    const result = await Xrm.WebApi.retrieveMultipleRecords<HomeDto>('jda_home', `?$select=jda_name&$filter=jda_name eq '${address}'`);
 
-            const homeEntity = response.entities[0] as HomeDto;
+    if (result.entities.length < 1) return undefined;
 
-            return {
-                id: homeEntity.jda_homeid,
-                name: homeEntity.jda_name,
-                notes: homeEntity.jda_notes ?? ''
-            };
-        })
-    );
-}
-
-export function retrieveContactsForHome(address: string | undefined): Observable<Contact[]> {
-    console.log(`Retrieving contacts for home at address: ${address}`);
-
-    if (!address) return of([]);
-
-    const fetchXml = `
-      <fetch>
-        <entity name="contact">
-          <attribute name="fullname" />
-          <attribute name="jda_notes" />
-          <link-entity name="jda_home" from="jda_homeid" to="jda_home" link-type="inner" alias="home">
-            <filter>
-              <condition attribute="jda_name" operator="eq" value="${address}" />
-            </filter>
-          </link-entity>
-        </entity>
-      </fetch>
-    `;
-
-    return fromPromise(
-        Xrm.WebApi.retrieveMultipleRecords('contact', `?fetchXml=${fetchXml}`)
-    ).pipe(
-        map(response => {
-            const contacts: Contact[] = [];
-
-            response.entities.forEach((entity: ContactDto) => {
-                contacts.push({
-                    id: entity.contactid,
-                    name: entity.fullname,
-                    notes: entity.jda_notes ?? ''
-                });
-            });
-
-            return contacts;
-        })
-    );
+    return result.entities[0].jda_homeid;
 }

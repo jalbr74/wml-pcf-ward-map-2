@@ -2,12 +2,11 @@ import { ComponentStore } from "use-component-store";
 import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
 import { Category } from "../models/category";
 import { catchError, EMPTY, switchMap, tap } from "rxjs";
-import { retrieveAddressesMatchingCategory, retrieveAllCategories } from "../utils/xrm-utils";
+import { retrieveAddressesMatchingCategory, retrieveAllCategories, retrieveHomeId } from "../utils/xrm-utils";
 import { HomeDto } from "../models/home";
 
 export interface AppState {
     highlightedAddresses: string[];
-    openedAddress?: string;
     availableCategories: Category[];
     availableAddresses: string[];
     selectedCategory?: Category;
@@ -100,21 +99,27 @@ export class AppStore extends ComponentStore<AppState> {
         });
     }
 
-    showHouseInfo(address: string) {
-        this.patchState({
-            openedAddress: address
-        });
-    }
+    async showHouseInfo(address: string) {
+        if (!/\d/.test(address)) return; // The address must contain at least one digit
 
-    hideHouseInfo() {
-        this.patchState({
-            openedAddress: undefined
-        });
-    }
+        Xrm.Utility.showProgressIndicator("Loading home information...");
 
-    highlightSelectedAddresses(highlightedAddresses: string[]) {
-        this.patchState({
-            highlightedAddresses
-        })
+        const homeId = await retrieveHomeId(address);
+        if (!homeId) return;
+
+        console.log(`Opening form for home with address: ${address} and ID: ${homeId}`);
+
+        Xrm.Utility.closeProgressIndicator();
+
+        await Xrm.Navigation.navigateTo({
+            pageType: "entityrecord",
+            entityName: "jda_home",
+            formId: "9d12b8f7-3b64-4aae-ab31-f969c91e74e9",
+            entityId: homeId
+        }, {
+            target: 2, // Open in a dialog
+            width: { value: 100, unit: "%" },
+            height: { value: 100, unit: "%" }
+        });
     }
 }
