@@ -15,7 +15,7 @@
         "deploy": "node scripts/deploy.js"
     },
     "dependencies": {
-        "@fluentui/react-components": "9.68.0",
+        "@fluentui/react-components": "9.46.2",
         "react": "16.14.0",
         "react-dom": "16.14.0",
         "rxjs": "^7.8.2",
