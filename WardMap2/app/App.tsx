@@ -9,8 +9,6 @@ import WardMap from '!@svgr/webpack!./ward-map/ward-map.svg';
 import { Dropdown, Label, Option } from "@fluentui/react-components";
 import { OptionOnSelectData, SelectionEvents } from "@fluentui/react-combobox";
 
-// TODO: Maybe we just open the Home form when a home is clicked, instead of building a custom dialog? It would be less work and would allow users to edit the home record directly.
-
 export function App(): React.JSX.Element {
     const [state, store] = useComponentStore(AppStore);
     const mapContentRef = useRef<HTMLDivElement>(null);
@@ -25,6 +23,11 @@ export function App(): React.JSX.Element {
         handleHouseClicked(e.target as Element, store).catch(console.error);
     }
 
+    function onAddressSelectionChanged(e: React.ChangeEvent<HTMLSelectElement>) {
+        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+        store.highlightSelectedAddresses(selectedOptions);
+    }
+
     return (
         <>
             <div className={styles.appContainer}>
@@ -35,6 +38,11 @@ export function App(): React.JSX.Element {
                             <Option key={category.id} value={category.id}>{category.name}</Option>
                         )}
                     </Dropdown>
+
+                    {/* This is handy for making sure all the houses have unique addresses */}
+                    {/*<select multiple size={1} onChange={onAddressSelectionChanged}>*/}
+                    {/*    {state.availableAddresses.map(address => <option key={address}>{address}</option>)}*/}
+                    {/*</select>*/}
                 </div>
                 <div ref={mapContentRef} className={styles.mapContent}>
                     <WardMap onClick={onMapClick}/>

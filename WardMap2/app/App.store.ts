@@ -89,4 +89,8 @@ export class AppStore extends ComponentStore<AppState> {
             height: { value: 100, unit: "%" }
         });
     }
+
+    highlightSelectedAddresses(highlightedAddresses: string[]) {
+        this.patchState({ highlightedAddresses });
+    }
 }
